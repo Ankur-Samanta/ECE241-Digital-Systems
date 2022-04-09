@@ -1,0 +1,107 @@
+module part3(A, B, Function, ALUout);
+	input [3:0] A; 
+	input [3:0] B;
+	input [5:0] Function;
+	wire c0, c1, c2, c3, c4, c5, c6;
+	output reg [7:0] ALUout; //declare output for always block
+	
+	part2 o0(A, B, 0, c0, c6); //what is c_in and c_out
+	verilog addition o1(A, B, c1);
+	signextension o2(B, c2);
+	atleast1 o3(A, B, c3);
+	all1 o4(A, B, c4);
+	concatenation o5(A, B, c5);
+
+	always@(*) //declare always block
+	begin
+		case (Function) //start case statement
+			0: ALUout = {3'b000, c6, c0};
+			1: ALUout = {3'b000, c1};
+			2: ALUout = c2;
+			3: ALUout = c3;
+			4: ALUout = c4;
+			5: ALUout = c5;
+			default: Out = 1'bx //output arbitrary x if input is undefined
+		endcase
+	end
+endmodule
+
+module part2(a, b, c_in, s, c_out);
+	input [3:0] a; //init inputs
+	input [3:0] b;
+	input c_in;
+	wire c1, c2, c3; //init wires
+	output [3:0] s; //init output
+	output c_out;
+	
+	fulladder a1(a[0], b[0], c_in, s[0], c1); //adder 1
+	fulladder a2(a[1], b[1], c1, s[1], c2); //adder 2
+	fulladder a3(a[2], b[2], c2, s[2], c3); //adder 3
+	fulladder a4(a[3], b[3], c3, s[3], c_out); //adder 4
+	
+endmodule //lab part 2 (4-bit carry-on adder)
+
+module fulladder(a, b, c_in, s, c_out);
+	input a, b, c_in; //init inputs
+	output s, c_out; //init outputs
+	
+	assign c_out = a*b + a*c_in + b*c_in; //logic statement for cout
+	assign s = a^b^c_in; //logic statement for sum
+	
+endmodule //fulladder module to be used for 4-bit adder
+
+module verilogaddition(a, b, s);
+	input [3:0] a;
+	input [3:0] b;
+	output [4:0] s;
+	
+	assign s = a + b; //use standard verilog addition
+	
+endmodule //verilogaddition module
+
+module signextension(a, s);
+	input [3:0] a;
+	output [7:0] s;
+	
+	assign s = {{4{a[3]}}, a};
+	
+endmodule //sign extension module
+
+module atleast1(a, b, s);
+	input [3:0] a;
+	input [3:0] b;
+	output reg [7:0] s;
+	
+	always @(*)
+	begin
+		if (|{a, b} == 1'b1)
+			assign s = 8'b00000001;
+		else
+			assign s = 8'b00000000;
+	end
+	
+endmodule
+
+module all1(a, b, s);
+	input [3:0] a;
+	input [3:0] b;
+	output reg [7:0] s;
+	
+	always @(*)
+	begin
+		if (&{a, b} == 1'b1) 
+			assign s = 8’b00000001;
+		else 
+			assign s = 8'b00000000;
+	end
+	
+endmodule
+
+module concatenation(a, b, s);
+	input [3:0] a;
+	input [3:0] b;
+	output [7:0] s;
+	
+	assign s = {a, b};
+	
+endmodule

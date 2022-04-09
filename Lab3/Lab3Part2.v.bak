@@ -1,0 +1,23 @@
+module part2(a, b, cin, s, cout);
+	input [3:0] a; //init inputs
+	input [3:0] b;
+	input cin;
+	wire c1, c2, c3; //init wires
+	output [3:0] s; //init output
+	output cout;
+	
+	fulladder a1(a[0], b[0], cin, s[0], c1); //adder 1
+	fulladder a2(a[1], b[1], c1, s[1], c2); //adder 2
+	fulladder a3(a[2], b[2], c2, s[2], c3); //adder 3
+	fulladder a4(a[3], b[3], c3, s[3], cout); //adder 4
+	
+endmodule //lab part 2 (4-bit carry-on adder)
+
+module fulladder(a, b, cin, s, cout);
+	input a, b, cin; //init inputs
+	output s, cout; //init outputs
+	
+	assign cout = a*b + a*cin + b*cin; //logic statement for cout
+	assign s = a^b^cin; //logic statement for sum
+	
+endmodule //fulladder module to be used for 4-bit adder
